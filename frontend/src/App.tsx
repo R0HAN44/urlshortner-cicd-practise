@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import './App.css';
 
 type Url = {
@@ -19,23 +19,26 @@ function App() {
 
   const BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
-  useEffect(() => {
-    fetchUrls();
-  }, []);
-
-  const fetchUrls = async () => {
+  const fetchUrls = useCallback(async () => {
     try {
       const response = await fetch(`${BASE_URL}/api/geturl`);
       if (!response.ok) throw new Error('Failed to fetch URLs');
-      
+  
       const data = await response.json();
-      console.log(data)
       setUrls(data.urlData);
-    } catch (err) {
-      console.error('Error fetching URLs:', err);
-      setError('Could not load URLs. Please try again later.');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error('Error fetching URLs:', err.message);
+        setError('Could not load URLs. Please try again later.');
+      }
     }
-  };
+  }, [BASE_URL]);
+
+  useEffect(() => {
+    fetchUrls();
+  }, [fetchUrls]);
+
+  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,8 +68,12 @@ function App() {
       const data = await response.json();
       setUrls(prevUrls => [data, ...prevUrls.filter(url => url._id !== data._id)]);
       setOriginalUrl('');
-    } catch (err: any) {
-      setError(err.message || 'Something went wrong. Please try again.');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message || 'Something went wrong. Please try again.');
+      } else {
+        setError('Something went wrong. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }
