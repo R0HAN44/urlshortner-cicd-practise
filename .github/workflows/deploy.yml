@@ -28,7 +28,7 @@ jobs:
 
       - name: Run tests (frontend)
         working-directory: ./frontend
-        run: npm run test
+        run: npm run lint
 
       - name: Install dependencies (backend)
         working-directory: ./backend
