@@ -40,8 +40,21 @@ urlRouter.post('/shorten', async (req: Request, res: Response) : Promise<any> =>
   }
 });
 
+
+// Get all URLs
+urlRouter.get('/geturl', async (req: Request, res: Response) => {
+  try {
+    const urls = await Url.find().sort({ createdAt: -1 });
+    res.json({status:'ok',urlData:urls});
+  } catch (error) {
+    console.error('Error fetching URLs:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 // Redirect to the original URL
 urlRouter.get('/:code', async (req: Request, res: Response):Promise<any> => {
+  console.log("got re code")
   try {
     const url = await Url.findOne({ urlCode: req.params.code });
 
@@ -56,17 +69,6 @@ urlRouter.get('/:code', async (req: Request, res: Response):Promise<any> => {
     return res.redirect(url.originalUrl);
   } catch (error) {
     console.error('Error redirecting to URL:', error);
-    res.status(500).json({ error: 'Server error' });
-  }
-});
-
-// Get all URLs
-urlRouter.get('/', async (req: Request, res: Response) => {
-  try {
-    const urls = await Url.find().sort({ createdAt: -1 });
-    res.json(urls);
-  } catch (error) {
-    console.error('Error fetching URLs:', error);
     res.status(500).json({ error: 'Server error' });
   }
 });

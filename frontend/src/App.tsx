@@ -17,7 +17,7 @@ function App() {
   const [error, setError] = useState('');
   const [copySuccess, setCopySuccess] = useState('');
 
-  const API_BASE_URL = 'http://localhost:5000/api';
+  const BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
   useEffect(() => {
     fetchUrls();
@@ -25,16 +25,12 @@ function App() {
 
   const fetchUrls = async () => {
     try {
-      const response = await fetch(`/api`,
-        {
-          method: 'GET',
-          credentials: 'include',
-        }
-      );
+      const response = await fetch(`${BASE_URL}/api/geturl`);
       if (!response.ok) throw new Error('Failed to fetch URLs');
       
       const data = await response.json();
-      setUrls(data);
+      console.log(data)
+      setUrls(data.urlData);
     } catch (err) {
       console.error('Error fetching URLs:', err);
       setError('Could not load URLs. Please try again later.');
@@ -53,12 +49,11 @@ function App() {
     setError('');
 
     try {
-      const response = await fetch(`/api/shorten`, {
+      const response = await fetch(`${BASE_URL}/api/shorten`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include',
         body: JSON.stringify({ originalUrl }),
       });
 
@@ -125,7 +120,7 @@ function App() {
               </tr>
             </thead>
             <tbody>
-              {urls.map((url) => (
+              {urls?.map((url) => (
                 <tr key={url._id}>
                   <td className="original-url" title={url.originalUrl}>
                     {url.originalUrl.length > 30
