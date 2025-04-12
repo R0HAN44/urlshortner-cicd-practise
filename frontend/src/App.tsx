@@ -17,7 +17,7 @@ function App() {
   const [error, setError] = useState('');
   const [copySuccess, setCopySuccess] = useState('');
 
-  const BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+  const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000';
 
   const fetchUrls = useCallback(async () => {
     try {
