@@ -47,9 +47,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa  # Note: fixed typo from "id_rsat" to "id_rsa"
+
       - name: Deploy via SSH
         run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@54.88.159.194 "cd urlshortner-cicd-practise && \
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/EC2_SSH_PRIVATE_KEY ubuntu@54.88.159.194 "cd urlshortner-cicd-practise && \
           git pull && \
           echo 'MONGODB_URI=${{ secrets.MONGODB_URI }}' > .env && \
           echo 'BASE_URL=${{ secrets.BASE_URL }}' >> .env && \
