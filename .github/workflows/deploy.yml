@@ -40,7 +40,7 @@ jobs:
 
   deploy:
     name: Deploy to EC2
-    needs: test  # Only runs if 'test' job succeeds
+    needs: test
     runs-on: ubuntu-latest
 
     steps:
@@ -51,11 +51,12 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa  # Note: fixed typo from "id_rsat" to "id_rsa"
+          chmod 600 ~/.ssh/id_rsa
+          ls -la ~/.ssh/id_rsa  # Debug: Verify the file exists and has correct permissions
 
       - name: Deploy via SSH
         run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/EC2_SSH_PRIVATE_KEY ubuntu@54.88.159.194 "cd urlshortner-cicd-practise && \
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@54.88.159.194 "cd urlshortner-cicd-practise && \
           git pull && \
           echo 'MONGODB_URI=${{ secrets.MONGODB_URI }}' > .env && \
           echo 'BASE_URL=${{ secrets.BASE_URL }}' >> .env && \
